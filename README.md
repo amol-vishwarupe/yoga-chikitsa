@@ -14,6 +14,22 @@ LangGraph multi-agent RAG pipeline built on Claude.
 
 ---
 
+## Screenshots
+
+**The Yoga Guru agent answering a question**, with the ancient-manuscript
+header, Sanskrit shlokas from Patanjali's Yoga Sutras, and the sidebar's sage
+portrait and asana gallery:
+
+![Yoga Chikitsa — header and the Yoga Guru agent's answer](images/Screenshot1.jpg)
+
+**The Doctor Advisor agent's safety note**, shown distinctly from the guru's
+answer, followed by clickable source-article pills linking back to the
+original habuild.in articles used to ground the response:
+
+![Yoga Chikitsa — Doctor's Note and cited sources](images/Screenshot2.jpg)
+
+---
+
 ## How it fits together
 
 ```
@@ -68,7 +84,8 @@ Yoga/
 │
 ├── images/                       # decorative art used by the chatbot UI
 │   ├── patanjali.jpg             # sage Patanjali portrait
-│   └── pose1.jpg, pose2.jpg, …   # 7 asana photos for the sidebar gallery
+│   ├── pose1.jpg, pose2.jpg, …   # 7 asana photos for the sidebar gallery
+│   └── Screenshot1.jpg, Screenshot2.jpg  # app screenshots (see README above)
 │
 └── .gitignore
 ```

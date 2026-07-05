@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+
+# Secrets
+.env
+.env.local
+
+# Generated vector store (regenerate with `python ingest.py`)
+chroma_db/
+
+# Logs
+*.log
+
+# Claude Code local settings (not for public sharing)
+.claude/
+
+# OS
+Thumbs.db
+.DS_Store

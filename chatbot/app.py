@@ -4,8 +4,10 @@ with yoga asanas and mudras, grounded (via LangGraph + Chroma RAG) in the
 scraped Asanas & Mudras article library.
 """
 
+import base64
 from pathlib import Path
 
+import speech_recognition as sr
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -23,48 +25,42 @@ def load_css() -> None:
     st.markdown(f"<style>{css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
 
+def _image_data_uri(path: Path) -> str:
+    encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
+    return f"data:image/jpeg;base64,{encoded}"
+
+
 load_css()
 
+habuild_path = IMAGES_DIR / "habuild.jpg"
+habuild_logo_html = (
+    f'<div class="powered-by"><span class="powered-by-label">Powered By</span>'
+    f'<a href="https://habuild.in/" target="_blank" rel="noopener noreferrer">'
+    f'<img src="{_image_data_uri(habuild_path)}" class="powered-by-logo" alt="Habuild" /></a></div>'
+    if habuild_path.exists()
+    else ""
+)
+
 st.markdown(
-    """
+    f"""
     <div class="sticky-header">
-        <div class="mandala-corner">❖ ✧ 🕉 ✧ ❖</div>
         <div class="yoga-header">
-            <h1>\U0001F549️ Yoga Chikitsa \U0001F549️</h1>
-            <div class="subtitle">Ancient wisdom for modern ailments — Asanas, Mudras &amp; Pranayama</div>
-            <div class="sanskrit-verse">।। अथ योगानुशासनम् ।।</div>
-            <div class="sanskrit-gloss">"Now, the discipline of Yoga" — Patanjali's Yoga Sutra 1.1</div>
-            <div class="byline">By<span class="author-name">Amol Vishwarupe</span></div>
+            <h1 class="devanagari-title"> ।। योग चिकित्सा ।। </h1>
+            {habuild_logo_html}
+            <div class="mandala-corner">❖ ✧ 🕉 ✧ ❖</div>
         </div>
-        <div class="ornate-divider">॥ ❖ ॥ ❖ ॥</div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 with st.sidebar:
-    patanjali_path = IMAGES_DIR / "patanjali.jpg"
-    if patanjali_path.exists():
-        st.image(str(patanjali_path), width="stretch")
-        st.markdown(
-            """
-            <div class="sage-caption">Sage Patanjali, author of the Yoga Sutras</div>
-            <div class="sanskrit-verse" style="font-size: 1rem; line-height: 1.7;">
-                योगेन चित्तस्य पदेन वाचां<br>
-                मलं शरीरस्य च वैद्यकेन।<br>
-                योऽपाकरोत्तं प्रवरं मुनीनां<br>
-                पतञ्जलिं प्राञ्जलिरानतोऽस्मि॥
-            </div>
-            <div class="sanskrit-gloss">
-                "I bow with folded hands to the noblest of sages, Patanjali, who removed
-                impurities of the mind through Yoga, of speech through grammar, and of the
-                body through medicine."
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    chakras_path = IMAGES_DIR / "chakras.jpg"
+    if chakras_path.exists():
+        with st.container(key="chakras-image"):
+            st.image(str(chakras_path), width="stretch")
 
-    st.markdown("### \U0001F4DC About this Ashram")
+    st.markdown("### \U0001F4DC About this Initiative")
     st.markdown(
         "Ask Yoga Chikitsa about any health concern — back pain, stress, digestion, "
         "sleep, and more — and receive guidance drawn from a library of yoga "
@@ -82,12 +78,10 @@ with st.sidebar:
     pose_images = sorted(IMAGES_DIR.glob("pose*.jpg"))
     if pose_images:
         st.markdown("### \U0001F9D8 Gallery of Asanas")
-        st.markdown('<div class="pose-gallery">', unsafe_allow_html=True)
         cols = st.columns(2)
         for i, img_path in enumerate(pose_images):
             with cols[i % 2]:
                 st.image(str(img_path), width="stretch")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown(
         '<div class="disclaimer-box">\U0001F6D5 <b>Not medical advice.</b> '
@@ -95,6 +89,11 @@ with st.sidebar:
         "certified yoga therapist for serious, persistent, or worsening conditions, "
         "or before starting a new practice if pregnant, injured, or managing a "
         "chronic illness.</div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="byline"><b>By</b><span class="author-name">Amol Vishwarupe</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -150,7 +149,24 @@ for message in st.session_state.messages:
                 message["guru_answer"], message["doctor_advice"], message.get("sources", [])
             )
 
-question = st.chat_input("Ask about a health concern, e.g. 'yoga for lower back pain'...")
+chat_value = st.chat_input(
+    "Ask about a health concern",
+    accept_audio=True,
+)
+
+question = None
+if chat_value:
+    question = chat_value.text
+    if not question and chat_value.audio is not None:
+        recognizer = sr.Recognizer()
+        try:
+            with sr.AudioFile(chat_value.audio) as source:
+                audio_data = recognizer.record(source)
+            question = recognizer.recognize_google(audio_data)
+        except sr.UnknownValueError:
+            st.error("Could not understand the voice message. Please try again.")
+        except sr.RequestError as exc:
+            st.error(f"Speech recognition service is unavailable: {exc}")
 
 if question:
     st.session_state.messages.append({"role": "user", "content": question})

@@ -49,9 +49,9 @@ header[data-testid="stHeader"] {
     fill: var(--gold-dark) !important;
 }
 
-/* Chat input box — light parchment background with bold black text for clarity */
+/* Chat input box — matches the sidebar's dark temple-wood background */
 [data-testid="stChatInputContainer"] {
-    background: #fffaf0 !important;
+    background: linear-gradient(180deg, var(--temple-brown) 0%, var(--temple-brown-dark) 100%) !important;
     border: 2px solid var(--gold) !important;
     border-radius: 12px !important;
 }
@@ -59,15 +59,15 @@ header[data-testid="stHeader"] {
 [data-testid="stChatInput"] textarea,
 [data-testid="stChatInputContainer"] textarea {
     color: #000000 !important;
-    background: #fffaf0 !important;
+    background: transparent !important;
     caret-color: #000000 !important;
     font-size: 1.15rem !important;
     font-weight: 500 !important;
 }
 
 [data-testid="stChatInput"] textarea::placeholder {
-    color: #5a4a30 !important;
-    opacity: 0.85;
+    color: #000000 !important;
+    opacity: 0.6;
     font-size: 1.1rem !important;
 }
 
@@ -133,6 +133,17 @@ p, li, span, div, label {
     font-size: 1.1rem;
     letter-spacing: 0.4rem;
     margin: 0.2rem 0;
+}
+
+/* Keeps the title block fixed at the top of the chat pane while messages
+   scroll underneath it, instead of scrolling away with the conversation. */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: radial-gradient(circle at top left, #f8efd9, #ecdcb2 55%, #e2cf9c 100%);
+    padding-top: 0.5rem;
+    padding-bottom: 0.2rem;
 }
 
 .yoga-header {

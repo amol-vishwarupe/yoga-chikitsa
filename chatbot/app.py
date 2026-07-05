@@ -27,15 +27,17 @@ load_css()
 
 st.markdown(
     """
-    <div class="mandala-corner">❖ ✧ 🕉 ✧ ❖</div>
-    <div class="yoga-header">
-        <h1>\U0001F549️ Yoga Chikitsa \U0001F549️</h1>
-        <div class="subtitle">Ancient wisdom for modern ailments — Asanas, Mudras &amp; Pranayama</div>
-        <div class="sanskrit-verse">।। अथ योगानुशासनम् ।।</div>
-        <div class="sanskrit-gloss">"Now, the discipline of Yoga" — Patanjali's Yoga Sutra 1.1</div>
-        <div class="byline">By<span class="author-name">Amol Vishwarupe</span></div>
+    <div class="sticky-header">
+        <div class="mandala-corner">❖ ✧ 🕉 ✧ ❖</div>
+        <div class="yoga-header">
+            <h1>\U0001F549️ Yoga Chikitsa \U0001F549️</h1>
+            <div class="subtitle">Ancient wisdom for modern ailments — Asanas, Mudras &amp; Pranayama</div>
+            <div class="sanskrit-verse">।। अथ योगानुशासनम् ।।</div>
+            <div class="sanskrit-gloss">"Now, the discipline of Yoga" — Patanjali's Yoga Sutra 1.1</div>
+            <div class="byline">By<span class="author-name">Amol Vishwarupe</span></div>
+        </div>
+        <div class="ornate-divider">॥ ❖ ॥ ❖ ॥</div>
     </div>
-    <div class="ornate-divider">॥ ❖ ॥ ❖ ॥</div>
     """,
     unsafe_allow_html=True,
 )
@@ -43,7 +45,7 @@ st.markdown(
 with st.sidebar:
     patanjali_path = IMAGES_DIR / "patanjali.jpg"
     if patanjali_path.exists():
-        st.image(str(patanjali_path), use_container_width=True)
+        st.image(str(patanjali_path), width="stretch")
         st.markdown(
             """
             <div class="sage-caption">Sage Patanjali, author of the Yoga Sutras</div>
@@ -84,7 +86,7 @@ with st.sidebar:
         cols = st.columns(2)
         for i, img_path in enumerate(pose_images):
             with cols[i % 2]:
-                st.image(str(img_path), use_container_width=True)
+                st.image(str(img_path), width="stretch")
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown(
@@ -152,8 +154,6 @@ question = st.chat_input("Ask about a health concern, e.g. 'yoga for lower back 
 
 if question:
     st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user", avatar="\U0001F9D8"):
-        st.markdown(question)
 
     # Feed the Yoga Guru agent only its own prior turns (not the Doctor's notes),
     # so its conversational memory stays in-persona.
@@ -161,6 +161,9 @@ if question:
         (m["role"], m["content"] if m["role"] == "user" else m["guru_answer"])
         for m in st.session_state.messages[:-1]
     ]
+
+    with st.chat_message("user", avatar="\U0001F9D8"):
+        st.markdown(question)
 
     with st.chat_message("assistant", avatar="\U0001F549️"):
         try:
